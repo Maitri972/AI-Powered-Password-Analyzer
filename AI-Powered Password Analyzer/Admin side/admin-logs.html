@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Logs - AI-PWA Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Base Admin Styles (Consistent) */
+        :root {
+            --primary-blue: #007bff;
+            --accent-green: #28a745;
+            --alert-red: #dc3545;
+            --alert-yellow: #ffc107;
+            --text-color-dark: #212529;
+            --light-bg: #f4f7f9; 
+            --card-bg: #ffffff;
+            --sidebar-bg: #2c3e50; 
+            --sidebar-text: #ecf0f1;
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08); 
+            --dark-gray: #343a40;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: var(--light-bg);
+            color: var(--text-color-dark);
+            min-height: 100vh;
+        }
+        /* --- Sidebar Navigation (Consistent) --- */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 20px 0;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
+        }
+        .sidebar h2 {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            color: var(--primary-blue);
+            margin-bottom: 40px;
+            font-weight: 800;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: var(--sidebar-text);
+            transition: background-color 0.3s, color 0.3s, border-left 0.3s;
+            font-size: 1.05em;
+        }
+        .sidebar-nav a i {
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background-color: rgba(0, 123, 255, 0.2);
+            color: var(--card-bg);
+            border-left: 5px solid var(--primary-blue);
+        }
+        
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+        }
+        .main-content h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            color: var(--text-color-dark);
+            margin-bottom: 5px;
+            font-size: 2.2em;
+            display: flex;
+            align-items: center;
+        }
+        .logs-intro {
+            color: #6c757d; 
+            margin-bottom: 30px; 
+            margin-left: 3px;
+        }
+
+        /* --- Log Controls and Filtering --- */
+        .log-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .filter-group label {
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+        .filter-group input, .filter-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            min-width: 150px;
+        }
+        .btn-refresh {
+            padding: 10px 15px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .btn-refresh:hover { background-color: #0056b3; }
+
+        /* --- Logs Table Styling --- */
+        .logs-container {
+            background-color: var(--card-bg);
+            padding: 0;
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            overflow-x: auto; /* Ensures table is scrollable on small screens */
+        }
+        .logs-table {
+            width: 100%; 
+            border-collapse: collapse; 
+            text-align: left;
+        }
+        .logs-table th, .logs-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        .logs-table th {
+            background-color: var(--light-bg);
+            border-bottom: 2px solid #ddd;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+        .logs-table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        .status-success { background-color: #d4edda; color: var(--accent-green); }
+        .status-fail { background-color: #f8d7da; color: var(--alert-red); }
+        .status-warn { background-color: #fff3cd; color: var(--alert-yellow); }
+        .status-info { background-color: #cfe2ff; color: var(--primary-blue); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><i class="fas fa-lock" style="margin-right: 10px; color: var(--primary-blue);"></i> AI-PWA Admin</h2>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="admin-profile.html" class="active"><i class="fas fa-user-circle"></i> Profile Settings</a>
+            <a href="admin-users.html"><i class="fas fa-users"></i> User Management</a>
+            <a href="admin-config.html"><i class="fas fa-cogs"></i> AI Rules Config</a>
+            <a href="admin-stats.html"><i class="fas fa-chart-line"></i> Analysis Statistics</a>
+            <a href="admin-logs.html" class="active"><i class="fas fa-clipboard-list"></i> Security Logs</a>
+            
+            
+            <a href="admin-login.html" style="margin-top: 50px; color: var(--alert-red);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h1><i class="fas fa-clipboard-list" style="margin-right: 10px; color: var(--primary-blue);"></i> System Security Logs</h1>
+        <p class="logs-intro">View and audit all critical system events, login attempts, configuration changes, and AI model alerts.</p>
+        
+        <div class="log-controls">
+            <div class="filter-group">
+                <label for="event-type">Filter by Event Type:</label>
+                <select id="event-type">
+                    <option value="all">All Events</option>
+                    <option value="login">User Logins</option>
+                    <option value="config">Configuration Changes</option>
+                    <option value="alert">Security Alerts</option>
+                    <option value="model">Model Activity</option>
+                </select>
+
+                <label for="status">Filter by Status:</label>
+                <select id="status">
+                    <option value="all">All Statuses</option>
+                    <option value="success">Success</option>
+                    <option value="fail">Failure/Error</option>
+                    <option value="warn">Warning</option>
+                </select>
+            </div>
+            <button class="btn-refresh"><i class="fas fa-sync-alt"></i> Refresh Logs</button>
+        </div>
+
+        <div class="logs-container">
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Event Type</th>
+                        <th>Source (User/IP)</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2025-10-29 08:35:12</td>
+                        <td>User Login</td>
+                        <td>**maitri@pwa-ai.com**</td>
+                        <td>Successful administrator login.</td>
+                        <td><span class="status-badge status-success">Success</span></td>
+                    </tr>
+                    <tr>
+                        <td>2025-10-29 08:30:45</td>
+                        <td>Configuration</td>
+                        <td>10.0.0.1 (System)</td>
+                        <td>AI Model 'Min Length' rule updated to 12.</td>
+                        <td><span class="status-badge status-info">Info</span></td>
+                    </tr>
+                    <tr>
+                        <td>2025-10-29 08:29:58</td>
+                        <td>Security Alert</td>
+                        <td>**203.0.113.4**</td>
+                        <td>5 consecutive failed login attempts. IP Blacklisted.</td>
+                        <td><span class="status-badge status-fail">Blocked</span></td>
+                    </tr>
+                    <tr>
+                        <td>2025-10-29 07:15:20</td>
+                        <td>Model Activity</td>
+                        <td>System Cron Job</td>
+                        <td>Daily database audit completed. Found 12 stale records.</td>
+                        <td><span class="status-badge status-success">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>2025-10-28 23:55:01</td>
+                        <td>User Management</td>
+                        <td>**analyst@pwa-ai.com**</td>
+                        <td>User 'DevOps' permissions escalated.</td>
+                        <td><span class="status-badge status-warn">Warning</span></td>
+                    </tr>
+                    <tr>
+                        <td>2025-10-28 23:45:10</td>
+                        <td>User Login</td>
+                        <td>192.168.1.55</td>
+                        <td>Login attempt failed (Invalid credentials).</td>
+                        <td><span class="status-badge status-fail">Failed</span></td>
+                    </tr>
+                    <tr>
+                        <td>2025-10-28 23:40:00</td>
+                        <td>Configuration</td>
+                        <td>**Super Admin**</td>
+                        <td>API Key rotation initiated successfully.</td>
+                        <td><span class="status-badge status-success">Success</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+</body>
+</html>

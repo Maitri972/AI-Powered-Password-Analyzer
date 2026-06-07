@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Login - AI-PWA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* I. CSS Variables (Copied from Home Page for consistency) */
+        :root {
+            --primary-blue: #007bff;
+            --primary-gradient: linear-gradient(90deg, #007bff, #0056b3);
+            --accent-green: #28a745;
+            --hero-bg-dark: #2c3e50;
+            --text-color-light: #ecf0f1;
+            --text-color-dark: #212529;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --border-color: #e9ecef;
+            --input-icon-color: #ced4da; 
+            --error-red: #dc3545; /* New error color */
+        }
+
+        /* II. Base Styles (Copied from Home Page) */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--light-bg);
+            color: var(--text-color-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* III. Header and Navigation (Unchanged) */
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 3px solid var(--primary-blue);
+            box-shadow: var(--shadow-premium);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        /* Logo Styling (Using composite Font Awesome icons to replace the missing image) */
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.7em;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--text-color-dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Logo Image Replacement Styling (Placeholder logic kept for visual consistency) */
+        .logo-image {
+            /* Since the image is missing, keeping the placeholder styling for context */
+            display: flex;
+            align-items: center;
+            height: 40px; 
+            margin-right: 10px;
+            transition: transform 0.3s;
+            position: relative;
+        }
+        
+        .logo-image .fa-shield-alt {
+            font-size: 32px; 
+            color: var(--primary-blue);
+        }
+        
+        .logo-image .fa-brain {
+            font-size: 18px; 
+            color: var(--accent-green); 
+            position: absolute;
+            bottom: 5px; 
+            right: 5px; 
+            transform: rotate(-10deg);
+        }
+
+        .logo:hover .logo-image {
+            transform: scale(1.05);
+        }
+
+        /* Navigation Links (Unchanged) */
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: var(--text-color-dark);
+            padding: 10px 15px;
+            font-weight: 600;
+            transition: color 0.3s;
+            border-radius: 4px;
+        }
+
+        .nav-links li a:hover {
+            color: var(--primary-blue);
+        }
+        
+        .nav-links li.login a {
+            background-image: var(--primary-gradient);
+            color: white;
+            padding: 8px 25px;
+            border-radius: 50px; 
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-left: 15px;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+        
+        .nav-links li.login a.active {
+            background-image: var(--primary-gradient); 
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .nav-links li.login a:hover {
+            background-image: linear-gradient(90deg, #0056b3, #007bff);
+            transform: translateY(-2px);
+        }
+
+        /* IV. Main Content - Login Form Styles (Minor changes for error display) */
+        main {
+            padding: 60px 0;
+            min-height: 80vh; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px; 
+            background-color: var(--card-bg);
+            padding: 40px; 
+            border-radius: 12px;
+            box-shadow: var(--shadow-premium);
+            text-align: center;
+            transition: transform 0.4s, box-shadow 0.4s;
+            border-top: 5px solid var(--primary-blue);
+        }
+        
+        .login-card:hover {
+            transform: translateY(-4px); 
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2); 
+        }
+        
+        .login-card h1 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary-blue);
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+        
+        /* Input styling for icon placement */
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px 15px 15px 50px; 
+            border: 1px solid var(--border-color);
+            border-radius: 5px; 
+            font-size: 1.05em;
+            box-sizing: border-box; 
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s;
+        }
+
+        .input-group .icon {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #ccc;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+        
+        /* NEW: Error message styling */
+        .error-message {
+            display: block;
+            text-align: left;
+            color: var(--error-red);
+            font-size: 0.85em;
+            margin-top: 5px;
+            font-weight: 600;
+            visibility: hidden; /* Start hidden */
+            height: 0;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .error-message.visible {
+            visibility: visible;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        /* NEW: Invalid state for input */
+        .input-field.invalid {
+            border-color: var(--error-red);
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px 50px; 
+            background-image: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 50px; 
+            font-size: 1.3em; 
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 10px 20px rgba(0, 123, 255, 0.4); 
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .login-btn:hover {
+            background-image: linear-gradient(90deg, #0056b3, #007bff);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(0, 123, 255, 0.6);
+        }
+        
+        .alt-link {
+            display: block;
+            margin-top: 10px;
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .alt-link:hover {
+            text-decoration: underline;
+        }
+
+        /* V. Footer (Copied from Home Page) (Unchanged) */
+        footer {
+            background-color: var(--hero-bg-dark); 
+            color: var(--text-color-light);
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .footer-links a {
+            color: var(--text-color-light);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 0.9em;
+            opacity: 0.8;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--primary-blue);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container navbar">
+        <a href="index.html" class="logo">
+            <img src="MY home page logo.png" alt="AI-PWA Logo: Shield, Brain, and Lock" class="logo-image">
+            AI-PWA
+        </a>
+
+        
+        <nav>
+                <ul class="nav-links">
+        <li><a href="analyzer.html">Analyzer</a></li>
+        <li><a href="generator.html">Generator</a></li>
+        <li><a href="blacklist.html">Breach Check</a></li>
+        <li><a href="about.html">About AI</a></li>
+        <li><a href="tech.html">Technology</a></li>
+        <li class="login"><a href="auth.html">Log In / Register</a></li> 
+    </ul>
+        </nav>
+    </div>
+</header>
+
+
+<main>
+    <div class="login-card">
+        <h1>Account Login</h1>
+        <form id="loginForm">
+            <div class="input-group">
+                <input type="email" placeholder="Email Address" class="input-field" id="email" required>
+                <i class="fas fa-envelope icon"></i>
+                <span id="emailError" class="error-message"></span>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" placeholder="Password" class="input-field" id="password" required>
+                <i class="fas fa-lock icon"></i>
+                <span id="passwordError" class="error-message"></span>
+            </div>
+            
+            <div class="input-group">
+                <input type="tel" placeholder="Phone Number (e.g., 555-555-1234)" class="input-field" id="phone" required>
+                <i class="fas fa-phone icon"></i>
+                <span id="phoneError" class="error-message"></span>
+            </div>
+            
+            <button type="submit" class="login-btn"><i class="fas fa-sign-in-alt"></i> Secure Login</button>
+        </form>
+        
+        <a href="#" class="alt-link">Forgot Password?</a>
+        <a href="#" class="alt-link">Don't have an account? Sign Up</a>
+    </div>
+</main>
+
+---
+
+<footer>
+    <div class="container">
+        <p style="margin-bottom: 15px; font-size: 0.9em; opacity: 0.8;">© 2025 AI-Powered Password Strength Analyzer. All Rights Reserved.</p>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Use</a>
+            <a href="#">Contact Support</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // ** JavaScript Client-Side Validation **
+    
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        // Prevent default form submission
+        event.preventDefault(); 
+        
+        // Run all validations
+        if (validateForm()) {
+            // If all checks pass, proceed with form submission (e.g., send data to server)
+            alert('Validation successful! Proceeding to server login...');
+            
+            // In a real application, you would do:
+            // this.submit(); 
+        } else {
+            // Validation failed, errors are already displayed
+            console.log('Validation failed. Please correct the errors.');
+        }
+    });
+
+    function validateForm() {
+        let isValid = true;
+        
+        const emailField = document.getElementById('email');
+        const passwordField = document.getElementById('password');
+        const phoneField = document.getElementById('phone');
+
+        // Reset errors and invalid classes
+        [emailField, passwordField, phoneField].forEach(field => {
+            field.classList.remove('invalid');
+            document.getElementById(field.id + 'Error').innerHTML = '';
+            document.getElementById(field.id + 'Error').classList.remove('visible');
+        });
+
+        // 1. Email Validation (Pattern)
+        if (!validateEmail(emailField.value)) {
+            displayError('email', 'Please enter a valid email address (e.g., user@domain.com).');
+            isValid = false;
+        }
+
+        // 2. Password Validation (Length and Pattern)
+        if (!validatePassword(passwordField.value)) {
+            // The function displays the specific error, so we just check for failure here
+            isValid = false;
+        }
+        
+        // 3. Phone Number Validation (Pattern)
+        if (!validatePhone(phoneField.value)) {
+            displayError('phone', 'Please enter a valid phone number (e.g., 123-456-7890).');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    /**
+     * Helper function to display an error message
+     * @param {string} fieldId - The ID of the field (e.g., 'email')
+     * @param {string} message - The error message to display
+     */
+    function displayError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const errorSpan = document.getElementById(fieldId + 'Error');
+        
+        field.classList.add('invalid');
+        errorSpan.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + message;
+        errorSpan.classList.add('visible');
+    }
+
+    /**
+     * Validates an email address against a common pattern.
+     * @param {string} email - The email value.
+     * @returns {boolean} True if the email is valid.
+     */
+    function validateEmail(email) {
+        // Simple but effective email regex: user@domain.tld
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailPattern.test(email);
+    }
+
+    /**
+     * Validates the password for length and complexity.
+     * @param {string} password - The password value.
+     * @returns {boolean} True if the password is valid.
+     */
+    function validatePassword(password) {
+        const minLength = 8;
+        // Regex: at least one uppercase, one lowercase, one number, one special character
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        if (password.length < minLength) {
+            displayError('password', 'Password must be at least ' + minLength + ' characters long.');
+            return false;
+        }
+
+        if (!passwordPattern.test(password)) {
+            displayError('password', 'Must contain: 1 uppercase, 1 lowercase, 1 number, and 1 special character.');
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Validates a phone number against a common pattern (e.g., 123-456-7890, (123) 456-7890, or 10 digits).
+     * @param {string} phone - The phone number value.
+     * @returns {boolean} True if the phone number is valid.
+     */
+    function validatePhone(phone) {
+        // Regex: Matches common formats like XXX-XXX-XXXX, (XXX) XXX-XXXX, XXXXXXXXXX, etc.
+        const phonePattern = /^(\+\d{1,2}\s?)?1?\-?\.?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+        return phonePattern.test(phone);
+    }
+    
+    // Optional: Validate on input change/blur for better UX
+    // email.addEventListener('blur', () => { validateEmail(email.value) || displayError('email', 'Invalid format.'); });
+    // password.addEventListener('blur', () => { validatePassword(password.value) || displayError('password', 'Insecure.'); });
+</script>
+
+</body>
+</html>

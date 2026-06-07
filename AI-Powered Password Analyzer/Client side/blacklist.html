@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breach Check & Blacklist - AI-PWA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* I. CSS Variables (Copied for consistency) */
+        :root {
+            --primary-blue: #007bff;
+            --primary-gradient: linear-gradient(90deg, #007bff, #0056b3);
+            --accent-green: #28a745;
+            --hero-bg-dark: #2c3e50;
+            --text-color-light: #ecf0f1;
+            --text-color-dark: #212529;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --border-color: #e9ecef;
+            --danger-red: #dc3545; /* For breach alerts */
+        }
+
+        /* II. Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--light-bg);
+            color: var(--text-color-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* III. Header and Navigation (Consistent) */
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 3px solid var(--primary-blue);
+            box-shadow: var(--shadow-premium);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        /* Logo Styling */
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.7em;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--text-color-dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Logo Image Replacement Styling (Composite Icon) */
+        .logo-image {
+            display: flex;
+            align-items: center;
+            height: 40px; 
+            margin-right: 10px;
+            position: relative;
+        }
+        
+        .logo-image .fa-shield-alt {
+            font-size: 32px; 
+            color: var(--primary-blue);
+        }
+        
+        .logo-image .fa-brain {
+            font-size: 18px; 
+            color: var(--accent-green); 
+            position: absolute;
+            bottom: 5px; 
+            right: 5px; 
+            transform: rotate(-10deg);
+        }
+
+        /* Navigation Links */
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: var(--text-color-dark);
+            padding: 10px 15px;
+            font-weight: 600;
+            transition: color 0.3s, background-color 0.3s;
+            border-radius: 4px;
+            white-space: nowrap; /* Prevent nav items from wrapping */
+        }
+
+        .nav-links li a:hover,
+        .nav-links li a.active {
+            color: var(--primary-blue);
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+        
+        .nav-links li.login a {
+            background-image: var(--primary-gradient);
+            color: white;
+            padding: 8px 25px;
+            border-radius: 50px; 
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-left: 15px;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        /* IV. Main Content - Blacklist Section */
+        main {
+            padding: 80px 0;
+            min-height: 75vh;
+        }
+
+        .blacklist-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .blacklist-wrapper h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3em;
+            font-weight: 800;
+            color: var(--hero-bg-dark);
+            margin-bottom: 10px;
+        }
+
+        .blacklist-wrapper p.lead {
+            font-size: 1.2em;
+            color: #6c757d;
+            margin-bottom: 40px;
+        }
+        
+        /* Check Card - Core UI */
+        .check-card {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-premium);
+            border-top: 5px solid var(--danger-red); 
+            text-align: left;
+        }
+        
+        /* Input Field Styling */
+        .input-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        #password-input {
+            width: 100%;
+            padding: 15px 20px;
+            padding-right: 50px; 
+            font-size: 1.1em;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: monospace;
+        }
+
+        #password-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+        
+        /* Check Button */
+        .check-btn {
+            width: 100%;
+            background-color: var(--danger-red);
+            color: white;
+            padding: 18px 50px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        .check-btn:hover {
+            background-color: #a82736;
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(220, 53, 69, 0.6);
+        }
+        
+        /* Result Display Area */
+        #result-area {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .result-safe {
+            background-color: #d4edda;
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+        }
+        
+        .result-breached {
+            background-color: #f8d7da;
+            color: var(--danger-red);
+            border: 1px solid var(--danger-red);
+        }
+        
+        .result-breached .action-link {
+            color: var(--primary-blue);
+            text-decoration: none;
+            margin-left: 10px;
+            font-weight: 700;
+        }
+        
+        .result-breached .action-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* V. Footer (Consistent) */
+        footer {
+            background-color: var(--hero-bg-dark); 
+            color: var(--text-color-light);
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .footer-links a {
+            color: var(--text-color-light);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 0.9em;
+            opacity: 0.8;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--primary-blue);
+        }
+        /* Mobile adjustment for wrapping navigation */
+        @media (max-width: 1200px) {
+            .nav-links li a {
+                padding: 8px 10px;
+                font-size: 0.95em;
+            }
+        }
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+            }
+            .nav-links {
+                margin-top: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .nav-links li {
+                margin: 5px;
+            }
+            .nav-links li.login a {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container navbar">
+        <a href="index.html" class="logo">
+            <img src="MY home page logo.png" alt="AI-PWA Logo: Shield, Brain, and Lock" class="logo-image">
+            AI-PWA
+        </a>
+        
+<nav>
+    <ul class="nav-links">
+        <li><a href="analyzer.html">Analyzer</a></li>
+        <li><a href="generator.html">Generator</a></li>
+        <li><a href="blacklist.html" class="active">Breach Check</a></li>
+        <li><a href="about.html">About AI</a></li>
+        <li><a href="tech.html">Technology</a></li>
+        <li class="login"><a href="login.html">Log In / Register</a></li> 
+    </ul>
+</nav>
+    </div>
+</header>
+
+
+
+<main>
+    <div class="container">
+        <section class="blacklist-wrapper">
+            <h1>Breach Check & Blacklist</h1>
+            <p class="lead">Protect yourself from common attacks. Check if your password has ever appeared in a **publicly known data breach** or belongs to a list of **common dictionary attacks**.</p>
+
+            <div class="check-card">
+                <form id="check-form">
+                    <div class="input-group">
+                        <label for="password-input" style="font-weight: 600;">Password to Check:</label>
+                        <input type="password" id="password-input" placeholder="Enter your password (client-side check only)">
+                    </div>
+                    
+                    <button type="button" class="check-btn" onclick="checkPasswordBreach()">
+                        <i class="fas fa-search"></i> Check My Security Status
+                    </button>
+                </form>
+                
+                <div id="result-area" style="display: none;">
+                    </div>
+                
+                <p style="margin-top: 30px; font-size: 0.9em; color: #6c757d; text-align: center;">*For maximum security, this check is simulated and performed using only the first five characters of the password hash (known as k-Anonymity) against a hypothetical list, and runs entirely in your browser.*</p>
+            </div>
+        </section>
+    </div>
+</main>
+
+---
+
+<footer>
+    <div class="container">
+        <p style="margin-bottom: 15px; font-size: 0.9em; opacity: 0.8;">© 2025 AI-Powered Password Strength Analyzer. All Rights Reserved.</p>
+        <div class="footer-links">
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="#">Terms of Use</a>
+            <a href="#">Contact Support</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // --- IMPORTANT: This is a client-side SIMULATION for demonstration purposes ---
+    const SIMULATED_BREACHED_PASSWORDS = [
+        "123456", "password", "qwerty", "ai-pwa1", "janedoe", "admin123", "secret"
+    ];
+
+    const checkPasswordBreach = () => {
+        const input = document.getElementById('password-input');
+        const password = input.value;
+        const resultArea = document.getElementById('result-area');
+        
+        if (password.length === 0) {
+            resultArea.style.display = 'none';
+            return;
+        }
+
+        // Simple check against the simulated list
+        const isBreached = SIMULATED_BREACHED_PASSWORDS.includes(password.toLowerCase());
+        
+        resultArea.style.display = 'block';
+        resultArea.className = ''; // Reset class
+
+        if (isBreached) {
+            resultArea.classList.add('result-breached');
+            resultArea.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i> **WARNING:** This password has been found in a simulated breach database! You must change it immediately.
+                <a href="generator.html" class="action-link">Generate New Password &raquo;</a>
+            `;
+        } else {
+            resultArea.classList.add('result-safe');
+            resultArea.innerHTML = `
+                <i class="fas fa-check-circle"></i> Good News! This password was **not** found in the simulated breach databases.
+            `;
+        }
+    };
+</script>
+
+</body>
+</html>

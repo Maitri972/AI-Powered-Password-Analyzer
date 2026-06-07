@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Password Analyzer - Real-time Score</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables for a dark/light theme contrast */
+        :root {
+            --primary-blue: #007bff;
+            --primary-gradient: linear-gradient(90deg, #007bff, #0056b3); /* Darker blue blend */
+            --accent-green: #28a745;
+            --hero-bg-dark: #2c3e50; /* Deep blue-gray for the hero */
+            --text-color-light: #ecf0f1;
+            --text-color-dark: #212529;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --border-color: #e9ecef;
+            
+            /* Strength Colors */
+            --weak-color: #dc3545; /* Red */
+            --medium-color: #ffc107; /* Yellow */
+            --strong-color: #28a745; /* Green */
+            --pending-color: #6c757d; /* Gray */
+        }
+
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--light-bg);
+            color: var(--text-color-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* I. Header and Navigation */
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 3px solid var(--primary-blue);
+            box-shadow: var(--shadow-premium);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.7em;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--text-color-dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-image {
+            height: 40px;
+            width: auto;
+            margin-right: 10px;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover .logo-image {
+            transform: scale(1.05);
+        }
+
+        /* Navigation Links */
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: var(--text-color-dark);
+            padding: 10px 15px;
+            font-weight: 600;
+            transition: color 0.3s, background-color 0.3s;
+            border-radius: 4px;
+        }
+
+        .nav-links li a:hover,
+        .nav-links li a.active {
+            color: var(--primary-blue);
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+        
+        .nav-links li.login a {
+            background-image: var(--primary-gradient);
+            color: white;
+            padding: 8px 25px;
+            border-radius: 50px;
+            transition: transform 0.3s;
+            margin-left: 15px;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .nav-links li.login a:hover {
+            background-image: linear-gradient(90deg, #0056b3, #007bff);
+            transform: translateY(-1px);
+        }
+
+        /* III. Main Content - Analyzer Specifics */
+        main {
+            padding: 60px 0;
+        }
+
+        .analyzer-section {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-premium);
+        }
+
+        .analyzer-section h1 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-color-dark);
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .analyzer-section .sub-text {
+            text-align: center;
+            color: var(--pending-color);
+            margin-bottom: 30px;
+        }
+
+        /* Input Group */
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 25px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        #password-input {
+            flex-grow: 1;
+            border: none;
+            padding: 15px 20px;
+            font-size: 1.25rem;
+            outline: none;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .toggle-visibility {
+            background-color: var(--light-bg);
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+            color: var(--pending-color);
+            transition: background-color 0.2s, color 0.2s;
+            font-size: 1.1em;
+        }
+
+        .toggle-visibility:hover {
+            background-color: var(--border-color);
+            color: var(--text-color-dark);
+        }
+
+        /* Strength Meter */
+        .strength-meter-container {
+            margin-bottom: 25px;
+        }
+
+        .meter-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .strength-meter {
+            height: 12px;
+            background-color: var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease-out, background-color 0.4s ease-out;
+            border-radius: 6px;
+        }
+        
+        .feedback-text {
+            font-size: 1.2em;
+            font-weight: 700;
+            text-align: center;
+            min-height: 30px;
+            margin-top: 15px;
+            color: var(--pending-color);
+        }
+        
+        /* Analysis Details */
+        .analysis-details {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .analysis-details h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5em;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+
+        .criteria-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .criteria-list li {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 1.05em;
+        }
+
+        .criteria-list li i {
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--hero-bg-dark);
+            color: var(--text-color-light);
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .footer-links a {
+            color: var(--text-color-light);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 0.9em;
+            opacity: 0.8;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--primary-blue);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container navbar">
+        <a href="index.html" class="logo">
+            <img src="MY home page logo.png" alt="AI-PWA Logo: Shield, Brain, and Lock" class="logo-image">
+            AI-PWA
+        </a>
+        
+<nav>
+    <ul class="nav-links">
+        <li><a href="analyzer.html" class="active">Analyzer</a></li>
+        <li><a href="generator.html">Generator</a></li>
+        <li><a href="blacklist.html">Breach Check</a></li>
+        <li><a href="about.html">About AI</a></li>
+        <li><a href="tech.html">Technology</a></li>
+        <li class="login"><a href="login.html">Log In / Register</a></li> 
+    </ul>
+</nav>
+    </div>
+</header>
+
+<main>
+    <section class="analyzer-section">
+        <h1>AI Real-Time Security Score</h1>
+        <p class="sub-text">Enter any password to receive an instant, intelligent security assessment. Your data stays local.</p>
+
+        <div class="input-card">
+            <div class="input-group">
+                <input type="password" id="password-input" placeholder="Enter your password here..." oninput="analyzePassword()">
+                <span class="toggle-visibility" onclick="toggleVisibility(this)"><i class="fas fa-eye"></i></span>
+            </div>
+
+            <div class="strength-meter-container">
+                <div class="meter-label">
+                    <span>Strength:</span>
+                    <span id="score-percentage">0%</span>
+                </div>
+                <div class="strength-meter">
+                    <div id="strength-bar" class="strength-bar"></div>
+                </div>
+            </div>
+
+            <div id="strength-feedback" class="feedback-text">Start typing to check...</div>
+        </div>
+
+        <div class="analysis-details">
+            <h2>Detailed Security Insights</h2>
+            <ul id="criteria-list" class="criteria-list">
+                <li><i class="fas fa-clock"></i> **Crack Time:** <span id="crack-time">Calculating...</span></li>
+                <li><i class="fas fa-ruler-horizontal"></i> **Length:** <span id="length-check">Too Short (Min 12)</span></li>
+                <li><i class="fas fa-font"></i> **Variety:** <span id="variety-check">Needs more character types.</span></li>
+                <li><i class="fas fa-robot"></i> **AI Pattern Check:** <span id="pattern-check">Checking for common patterns...</span></li>
+            </ul>
+            <p style="margin-top: 20px; font-style: italic; color: var(--pending-color);">Tip: Use the Generator tab for highly secure, random passwords.</p>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container">
+        <p style="margin-bottom: 15px; font-size: 0.9em; opacity: 0.8;">© 2025 AI-Powered Password Strength Analyzer. All Rights Reserved.</p>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Use</a>
+            <a href="#">Contact Support</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    /** Strength Analysis Logic (Simplified Client-Side) **/
+    
+    function toggleVisibility(toggleElement) {
+        const input = document.getElementById('password-input');
+        const icon = toggleElement.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    function getPasswordScore(password) {
+        let score = 0;
+        const len = password.length;
+        
+        // --- Score Components ---
+        // 1. Length
+        score += Math.min(30, len * 3);
+
+        // 2. Character Variety (Max 50 points)
+        if (/[a-z]/.test(password)) score += 10;
+        if (/[A-Z]/.test(password)) score += 10;
+        if (/\d/.test(password)) score += 15;
+        if (/[^a-zA-Z0-9]/.test(password)) score += 15;
+
+        // 3. Length Bonus (Max 20 points)
+        if (len >= 12) score += 10;
+        if (len >= 16) score += 10;
+
+        // 4. Penalty for common patterns (Simulated AI check)
+        let patternCheckStatus = 'OK';
+        if (password.toLowerCase().includes('password') || password.toLowerCase().includes('123456') || password.toLowerCase().includes('qwerty')) {
+            score -= 30;
+            patternCheckStatus = 'Fails common pattern check 🚫';
+        } else if (/\d{4,}/.test(password) || /([a-z])\1\1/.test(password)) {
+             score -= 15; // Penalty for long sequences of same type or repeated chars
+             patternCheckStatus = 'Contains excessive sequence/repetition ⚠️';
+        } else {
+            patternCheckStatus = 'Passed pattern check ✅';
+        }
+        
+        document.getElementById('pattern-check').innerHTML = patternCheckStatus;
+
+        return Math.max(0, Math.min(100, score));
+    }
+
+    function analyzePassword() {
+        const input = document.getElementById('password-input');
+        const bar = document.getElementById('strength-bar');
+        const feedback = document.getElementById('strength-feedback');
+        const scorePercentage = document.getElementById('score-percentage');
+        const password = input.value;
+
+        if (password.length === 0) {
+            bar.style.width = '0%';
+            bar.style.backgroundColor = 'var(--pending-color)';
+            feedback.textContent = 'Start typing to check...';
+            scorePercentage.textContent = '0%';
+            document.getElementById('crack-time').textContent = 'Calculating...';
+            document.getElementById('length-check').textContent = 'Too Short (Min 12)';
+            document.getElementById('variety-check').textContent = 'Needs more character types.';
+            document.getElementById('pattern-check').innerHTML = 'Checking for common patterns...';
+            return;
+        }
+
+        const score = getPasswordScore(password);
+        let color, text, crackTime;
+
+        if (score < 40) {
+            color = 'var(--weak-color)';
+            text = 'Weak 🚨 (Crackable in minutes)';
+            crackTime = 'Minutes to Hours';
+        } else if (score < 75) {
+            color = 'var(--medium-color)';
+            text = 'Medium ⚠️ (Improve length & variety)';
+            crackTime = 'Days to Months';
+        } else {
+            color = 'var(--strong-color)';
+            text = 'Strong! ✅ (Excellent resistance)';
+            crackTime = 'Years to Centuries';
+        }
+
+        bar.style.width = score + '%';
+        bar.style.backgroundColor = color;
+        feedback.textContent = text;
+        scorePercentage.textContent = score + '%';
+        document.getElementById('crack-time').textContent = crackTime;
+        document.getElementById('length-check').textContent = password.length >= 12 ? 'Excellent Length 👍' : `Length: ${password.length} (Recommend 12+)`;
+
+        const variety = [/[a-z]/.test(password), /[A-Z]/.test(password), /\d/.test(password), /[^a-zA-Z0-9]/.test(password)].filter(x => x).length;
+        document.getElementById('variety-check').textContent = variety >= 4 ? 'Excellent Variety of Characters 👌' : `Only ${variety}/4 types detected.`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+         const inputField = document.getElementById('password-input');
+         if (inputField) {
+             inputField.addEventListener('input', analyzePassword);
+             analyzePassword();
+         }
+    });
+</script>
+<script src="password-analyzer.js"></script>
+</body>
+</html>

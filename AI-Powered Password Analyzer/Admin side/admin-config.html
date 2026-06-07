@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced AI Config - AI-PWA Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Base Admin Styles (Consistent) */
+        :root {
+            --primary-blue: #007bff;
+            --accent-green: #28a745;
+            --alert-red: #dc3545;
+            --alert-yellow: #ffc107;
+            --text-color-dark: #212529;
+            --light-bg: #f4f7f9; 
+            --card-bg: #ffffff;
+            --sidebar-bg: #2c3e50; 
+            --sidebar-text: #ecf0f1;
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08); 
+            --dark-gray: #343a40;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: var(--light-bg);
+            color: var(--text-color-dark);
+            min-height: 100vh;
+        }
+        /* --- Sidebar Navigation (Consistent) --- */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 20px 0;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
+        }
+        .sidebar h2 {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            color: var(--primary-blue);
+            margin-bottom: 40px;
+            font-weight: 800;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: var(--sidebar-text);
+            transition: background-color 0.3s, color 0.3s, border-left 0.3s;
+            font-size: 1.05em;
+        }
+        .sidebar-nav a i {
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background-color: rgba(0, 123, 255, 0.2);
+            color: var(--card-bg);
+            border-left: 5px solid var(--primary-blue);
+        }
+        
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+        }
+        .main-content h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            color: var(--text-color-dark);
+            margin-bottom: 5px;
+            font-size: 2.2em;
+            display: flex;
+            align-items: center;
+        }
+        .config-intro {
+            color: #6c757d; 
+            margin-bottom: 30px; 
+            margin-left: 3px;
+        }
+
+        /* --- New Config Card Layout --- */
+        .config-layout {
+            display: grid;
+            grid-template-columns: 3fr 1fr; /* Settings area vs. Side status */
+            gap: 30px;
+        }
+        .config-panel {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+        }
+
+        /* --- Tabbed Navigation Styles --- */
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            padding: 0 30px;
+        }
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 15px 20px;
+            font-size: 1.05em;
+            font-weight: 600;
+            color: #6c757d;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -1px; /* Align with border */
+            transition: color 0.3s, border-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-button.active, .tab-button:hover {
+            color: var(--primary-blue);
+        }
+        .tab-button.active {
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .tab-content {
+            padding: 30px;
+        }
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* --- Form Elements --- */
+        .form-group {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            background-color: var(--light-bg);
+        }
+        .form-group label {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--dark-gray);
+            font-size: 1.1em;
+        }
+        .form-group input[type="number"], .form-group input[type="range"], .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-top: 8px;
+        }
+        .range-value {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-left: 10px;
+        }
+        .help-text {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        .form-action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .btn-save {
+            padding: 12px 25px;
+            background-color: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-save:hover { background-color: #1e7e34; }
+        .btn-reset {
+             padding: 12px 25px;
+            background-color: #ccc;
+            color: var(--dark-gray);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        /* --- Side Status Panel --- */
+        .status-panel {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            height: fit-content;
+        }
+        .status-panel h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.3em;
+            color: var(--dark-gray);
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95em;
+        }
+        .status-indicator {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+        .text-success { background-color: #d4edda; color: var(--accent-green); }
+        .text-error { background-color: #f8d7da; color: var(--alert-red); }
+        .text-warning { background-color: #fff3cd; color: var(--alert-yellow); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><i class="fas fa-lock" style="margin-right: 10px; color: var(--primary-blue);"></i> AI-PWA Admin</h2>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="admin-profile.html" class="active"><i class="fas fa-user-circle"></i> Profile Settings</a>
+            <a href="admin-users.html"><i class="fas fa-users"></i> User Management</a>
+            <a href="admin-config.html" class="active"><i class="fas fa-cogs"></i> AI Rules Config</a>
+            <a href="admin-stats.html"><i class="fas fa-chart-line"></i> Analysis Statistics</a>
+            <a href="admin-logs.html"><i class="fas fa-clipboard-list"></i> Security Logs</a>
+            
+            <a href="admin-login.html" style="margin-top: 50px; color: var(--alert-red);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h1><i class="fas fa-cogs" style="margin-right: 10px; color: var(--primary-blue);"></i> Advanced AI Model Configuration</h1>
+        <p class="config-intro">Manage the scoring weights, content filters, and API settings for the core security model.</p>
+        
+        <form>
+            <div class="config-layout">
+                <div class="config-panel">
+                    
+                    <div class="tab-nav">
+                        <button type="button" class="tab-button active" data-tab="scoring"><i class="fas fa-balance-scale"></i> Scoring Logic</button>
+                        <button type="button" class="tab-button" data-tab="filters"><i class="fas fa-filter"></i> Safety Filters</button>
+                        <button type="button" class="tab-button" data-tab="api"><i class="fas fa-key"></i> API Integration</button>
+                    </div>
+
+                    <div class="tab-content">
+                        <div id="scoring" class="tab-pane active">
+                            <div class="form-group">
+                                <label for="min-score"><i class="fas fa-exclamation-triangle" style="color: var(--alert-red); margin-right: 8px;"></i> Minimum Required Score (%)</label>
+                                <div class="slider-wrapper">
+                                    <input type="range" id="min-score" min="50" max="95" step="1" value="75" oninput="document.getElementById('min-score-val').innerText = this.value + '%'">
+                                    <span id="min-score-val" class="range-value">75%</span>
+                                </div>
+                                <span class="help-text">The lowest score a password can achieve before being auto-rejected by the system.</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="length-weight"><i class="fas fa-ruler-horizontal" style="color: #6c757d; margin-right: 8px;"></i> Length Scoring Weight (%)</label>
+                                <div class="slider-wrapper">
+                                    <input type="range" id="length-weight" min="10" max="50" step="5" value="30" oninput="document.getElementById('length-weight-val').innerText = this.value + '%'">
+                                    <span id="length-weight-val" class="range-value">30%</span>
+                                </div>
+                                <span class="help-text">Defines the maximum percentage of the total score contributed by password length.</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="complexity-multiplier"><i class="fas fa-brain" style="color: #6c757d; margin-right: 8px;"></i> Character Diversity Multiplier</label>
+                                <input type="number" id="complexity-multiplier" value="1.5" step="0.1" min="1.0" max="3.0">
+                                <span class="help-text">A factor applied to scores to reward use of multiple character classes (uppercase, symbols, numbers).</span>
+                            </div>
+                        </div>
+
+                        <div id="filters" class="tab-pane">
+                            <div class="form-group">
+                                <label for="dictionary-enable"><i class="fas fa-book" style="color: var(--primary-blue); margin-right: 8px;"></i> Enable Common Dictionary Blocking</label>
+                                <select id="dictionary-enable">
+                                    <option value="true">Enabled (Block Top 100K)</option>
+                                    <option value="false">Disabled (High Risk)</option>
+                                </select>
+                                <span class="help-text">Blocks any password found in the common public domain password lists.</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="rate-limit"><i class="fas fa-tachometer-alt" style="color: var(--alert-yellow); margin-right: 8px;"></i> Analysis Rate Limit (Per User/Min)</label>
+                                <input type="number" id="rate-limit" value="10" min="1" max="100">
+                                <span class="help-text">Throttles requests to prevent automated brute-forcing attempts on the validation service.</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="policy-url"><i class="fas fa-link" style="color: #6c757d; margin-right: 8px;"></i> Enforcement Policy URL</label>
+                                <input type="text" id="policy-url" value="https://system.com/security/policy.pdf">
+                                <span class="help-text">External link to the corporate password policy for user reference.</span>
+                            </div>
+                        </div>
+
+                        <div id="api" class="tab-pane">
+                            <div class="form-group">
+                                <label for="api-key"><i class="fas fa-fingerprint" style="color: var(--alert-red); margin-right: 8px;"></i> Primary Model API Key</label>
+                                <input type="text" id="api-key" value="SK-XXXXXXXX-Hidden-YYYYYYYY" readonly>
+                                <span class="help-text">**CRITICAL:** Only administrators can view this key. Use **Rotation** below.</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="endpoint"><i class="fas fa-network-wired" style="color: var(--accent-green); margin-right: 8px;"></i> Model Endpoint URL</label>
+                                <input type="text" id="endpoint" value="https://api.pwa-ai.com/v2/analyze" readonly>
+                                <span class="help-text">The secure endpoint for all password analysis requests.</span>
+                            </div>
+
+                            <button type="button" class="btn-save" style="background-color: var(--alert-red);">
+                                <i class="fas fa-sync-alt"></i> Rotate API Key Now
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-action-buttons">
+                        <button type="button" class="btn-reset">
+                            <i class="fas fa-undo"></i> Reset Tab Defaults
+                        </button>
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-check-circle"></i> Apply and Deploy Changes
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="status-panel">
+                    <h3><i class="fas fa-heartbeat" style="margin-right: 5px; color: var(--accent-green);"></i> Model Health Status</h3>
+                    
+                    <div class="status-item">
+                        Model Version:
+                        <span style="font-weight: 600;">v2.1.3</span>
+                    </div>
+                    <div class="status-item">
+                        Last Deployed:
+                        <span style="font-weight: 600;">Oct 29, 2025</span>
+                    </div>
+                    <div class="status-item">
+                        Service Uptime:
+                        <span class="status-indicator text-success">99.99%</span>
+                    </div>
+                    <div class="status-item">
+                        API Latency (P95):
+                        <span class="status-indicator text-success"> < 50ms</span>
+                    </div>
+                    <div class="status-item">
+                        Dictionary Synced:
+                        <span class="status-indicator text-success"><i class="fas fa-check"></i> Yes</span>
+                    </div>
+                    <div class="status-item">
+                        Certificates Valid:
+                        <span class="status-indicator text-warning"><i class="fas fa-exclamation-triangle"></i> Expiring Soon</span>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // JavaScript for tab functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            // Set initial active state and show first tab
+            document.querySelector('#scoring').classList.add('active');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons and panes
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+
+                    // Add active class to the clicked button
+                    button.classList.add('active');
+
+                    // Show the corresponding tab pane
+                    const targetTabId = button.getAttribute('data-tab');
+                    document.getElementById(targetTabId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Security Dashboard - AI-PWA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* I. CSS Variables (Copied for consistency) */
+        :root {
+            --primary-blue: #007bff;
+            --primary-gradient: linear-gradient(90deg, #007bff, #0056b3);
+            --accent-green: #28a745;
+            --hero-bg-dark: #2c3e50;
+            --text-color-light: #ecf0f1;
+            --text-color-dark: #212529;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --border-color: #e9ecef;
+            /* Dashboard Colors */
+            --warning-orange: #ffc107;
+            --danger-red: #dc3545;
+        }
+
+        /* II. Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--light-bg);
+            color: var(--text-color-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* III. Header and Navigation (Consistent) */
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 3px solid var(--primary-blue);
+            box-shadow: var(--shadow-premium);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        /* Logo Styling */
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.7em;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--text-color-dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Logo Image Replacement Styling (Composite Icon) */
+        .logo-image {
+            display: flex;
+            align-items: center;
+            height: 40px; 
+            margin-right: 10px;
+            position: relative;
+        }
+        
+        .logo-image .fa-shield-alt {
+            font-size: 32px; 
+            color: var(--primary-blue);
+        }
+        
+        .logo-image .fa-brain {
+            font-size: 18px; 
+            color: var(--accent-green); 
+            position: absolute;
+            bottom: 5px; 
+            right: 5px; 
+            transform: rotate(-10deg);
+        }
+
+        /* Navigation Links */
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: var(--text-color-dark);
+            padding: 10px 15px;
+            font-weight: 600;
+            transition: color 0.3s, background-color 0.3s;
+            border-radius: 4px;
+            white-space: nowrap; /* Prevent nav items from wrapping */
+        }
+
+        .nav-links li a:hover,
+        .nav-links li a.active {
+            color: var(--primary-blue);
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+        
+        .nav-links li.login a {
+            background-image: var(--primary-gradient);
+            color: white;
+            padding: 8px 25px;
+            border-radius: 50px; 
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-left: 15px;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        /* IV. Main Content - Dashboard Layout */
+        main {
+            padding: 60px 0;
+            min-height: 80vh;
+        }
+
+        .dashboard-header {
+            margin-bottom: 40px;
+            border-left: 5px solid var(--accent-green);
+            padding-left: 20px;
+        }
+
+        .dashboard-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.8em;
+            font-weight: 800;
+            color: var(--hero-bg-dark);
+            margin-bottom: 5px;
+        }
+        
+        .dashboard-header p {
+            font-size: 1.1em;
+            color: #6c757d;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-premium);
+            text-align: center;
+            border-bottom: 5px solid var(--primary-blue);
+        }
+        
+        .stat-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2em;
+            color: var(--text-color-dark);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3em;
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+        
+        /* Specific Status Colors */
+        .stat-card.risk-high { border-bottom-color: var(--danger-red); }
+        .stat-card.risk-medium { border-bottom-color: var(--warning-orange); }
+        .stat-card.risk-low { border-bottom-color: var(--accent-green); }
+
+        .stat-card.risk-high .value { color: var(--danger-red); }
+        .stat-card.risk-medium .value { color: var(--warning-orange); }
+        .stat-card.risk-low .value { color: var(--accent-green); }
+
+        /* Recommendation Section */
+        .recommendation-card {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-premium);
+            border-left: 5px solid var(--danger-red);
+        }
+        
+        .recommendation-card h2 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--danger-red);
+            font-size: 2em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .recommendation-card h2 i {
+            margin-right: 15px;
+            font-size: 1em;
+        }
+
+        .recommendation-card .action-button {
+            /* Matches CTA button style for high impact */
+            background-image: var(--primary-gradient);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+            transition: transform 0.3s;
+        }
+        
+        .recommendation-card .action-button:hover {
+            transform: translateY(-2px);
+        }
+
+
+        /* V. Footer (Consistent) */
+        footer {
+            background-color: var(--hero-bg-dark); 
+            color: var(--text-color-light);
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .footer-links a {
+            color: var(--text-color-light);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 0.9em;
+            opacity: 0.8;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--primary-blue);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container navbar">
+        <a href="index.html" class="logo">
+            <img src="MY home page logo.png" alt="AI-PWA Logo: Shield, Brain, and Lock" class="logo-image">
+            AI-PWA
+        </a>
+        
+        <nav>
+    <ul class="nav-links">
+        <li><a href="analyzer.html">Analyzer</a></li>
+        <li><a href="generator.html">Generator</a></li>
+        <li><a href="blacklist.html">Breach Check</a></li>
+        <li><a href="about.html">About AI</a></li>
+        <li><a href="tech.html">Technology</a></li>
+        <li class="login"><a href="login.html" class="active" onclick="logoutUser()">Log Out</a></li> 
+    </ul>
+</nav>
+    </div>
+</header>
+
+
+
+<main>
+    <div class="container">
+        <section class="dashboard-header">
+            <h1>Welcome Back, MAITRI 👋</h1>
+            <p>Your personalized security snapshot based on your recent activity with the **AI-Powered Password Strength Analyzer** suite.</p>
+        </section>
+
+        <div class="stats-grid">
+            
+            <div class="stat-card risk-high">
+                <h3>Weak Passwords Detected</h3>
+                <div class="value">4</div>
+                <p style="color: var(--danger-red); font-weight: 600;">Immediate Risk</p>
+            </div>
+            
+            <div class="stat-card risk-low">
+                <h3>Strong Passwords Generated</h3>
+                <div class="value">12</div>
+                <p style="color: var(--accent-green); font-weight: 600;">Excellent Progress</p>
+            </div>
+            
+            <div class="stat-card risk-medium">
+                <h3>Average Password Score</h3>
+                <div class="value">72%</div>
+                <p style="color: var(--warning-orange); font-weight: 600;">Needs Improvement</p>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Breach Checks Performed</h3>
+                <div class="value">28</div>
+                <p style="color: var(--primary-blue); font-weight: 600;">Keep Up The Good Work</p>
+            </div>
+        </div>
+
+        <section class="recommendation-card">
+            <h2><i class="fas fa-exclamation-triangle"></i> Security Alert: Weak Passwords Found</h2>
+            <p>Our AI model has detected a high risk level in four passwords you recently analyzed. These weaknesses leave you vulnerable to dictionary and brute-force attacks. Prioritize fixing these now.</p>
+            
+            <a href="generator.html" class="action-button">
+                Generate Secure Replacements <i class="fas fa-arrow-right"></i>
+            </a>
+            
+            <a href="analyzer.html" class="action-button" style="margin-left: 15px; background-image: none; background-color: var(--hero-bg-dark); box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);">
+                Review Analyzer History
+            </a>
+        </section>
+        
+    </div>
+</main>
+
+
+
+<footer>
+    <div class="container">
+        <p style="margin-bottom: 15px; font-size: 0.9em; opacity: 0.8;">© 2025 AI-Powered Password Strength Analyzer. All Rights Reserved.</p>
+        <div class="footer-links">
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="#">Terms of Use</a>
+            <a href="#">Contact Support</a>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

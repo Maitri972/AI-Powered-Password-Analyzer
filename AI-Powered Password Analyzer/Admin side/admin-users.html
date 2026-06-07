@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - AI-PWA Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Base Admin Styles (For Consistency) */
+        :root {
+            --primary-blue: #007bff;
+            --accent-green: #28a745;
+            --alert-red: #dc3545;
+            --alert-yellow: #ffc107;
+            --text-color-dark: #212529;
+            --light-bg: #f4f7f9; 
+            --card-bg: #ffffff;
+            --sidebar-bg: #2c3e50; 
+            --sidebar-text: #ecf0f1;
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08); 
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: var(--light-bg);
+            color: var(--text-color-dark);
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar Navigation (Consistent) --- */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 20px 0;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
+        }
+        .sidebar h2 {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            color: var(--primary-blue);
+            margin-bottom: 40px;
+            font-weight: 800;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: var(--sidebar-text);
+            transition: background-color 0.3s, color 0.3s, border-left 0.3s;
+            font-size: 1.05em;
+        }
+        .sidebar-nav a i {
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background-color: rgba(0, 123, 255, 0.2);
+            color: var(--card-bg);
+            border-left: 5px solid var(--primary-blue);
+        }
+        
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+        }
+        .main-content h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            color: var(--text-color-dark);
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        
+        /* --- Table Styling --- */
+        .table-controls {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+        .search-input {
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            width: 70%; 
+            font-size: 1em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: border-color 0.3s;
+        }
+        .search-input:focus {
+             border-color: var(--primary-blue);
+             outline: none;
+        }
+        .add-user-button {
+            padding: 12px 25px; 
+            background-color: var(--accent-green); 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+            transition: background-color 0.3s;
+        }
+        .add-user-button:hover {
+            background-color: #218838;
+        }
+        
+        .table-container {
+            background-color: var(--card-bg); 
+            border-radius: 12px; 
+            box-shadow: var(--shadow-light); 
+            overflow-x: auto;
+            padding: 10px; /* Padding for the shadow/card look */
+        }
+        .admin-table {
+            width: 100%; 
+            border-collapse: collapse; 
+            text-align: left;
+        }
+        .admin-table th, .admin-table td {
+            padding: 15px 15px; 
+            border-bottom: 1px solid #eee;
+        }
+        .admin-table th {
+            background-color: var(--light-bg);
+            border-bottom: 2px solid #ddd;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+        .action-button {
+            border: none;
+            background: none;
+            cursor: pointer;
+            margin-right: 12px;
+            font-size: 1.1em;
+            transition: opacity 0.2s;
+        }
+        .action-button:hover {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><i class="fas fa-lock" style="margin-right: 10px; color: var(--primary-blue);"></i> AI-PWA Admin</h2>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="admin-profile.html" class="active"><i class="fas fa-user-circle"></i> Profile Settings</a>
+            <a href="admin-users.html" class="active"><i class="fas fa-users"></i> User Management</a>
+            <a href="admin-config.html"><i class="fas fa-cogs"></i> AI Rules Config</a>
+            <a href="admin-stats.html"><i class="fas fa-chart-line"></i> Analysis Statistics</a>
+            <a href="admin-logs.html"><i class="fas fa-clipboard-list"></i> Security Logs</a>
+            
+            <a href="admin-login.html" style="margin-top: 50px; color: var(--alert-red);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h1><i class="fas fa-user-friends" style="margin-right: 10px; color: var(--primary-blue);"></i> User Management</h1>
+        <p style="color: #6c757d; margin-top: -20px; margin-bottom: 30px;">View, search, and manage all user accounts registered with the AI-PWA system.</p>
+        
+        <div class="table-controls">
+            <input type="text" placeholder="Search by name, email, or ID..." class="search-input">
+            <button class="add-user-button">
+                <i class="fas fa-user-plus"></i> Add New User
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Last Activity</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1001</td>
+                        <td>Maitri V.</td>
+                        <td>maitri@example.com</td>
+                        <td><span style="color: var(--accent-green); font-weight: 600;">Active</span></td>
+                        <td>5m ago (Password Check)</td>
+                        <td>
+                            <button title="View Profile" class="action-button" style="color: var(--primary-blue);"><i class="fas fa-eye"></i></button>
+                            <button title="Reset Password" class="action-button" style="color: var(--alert-yellow);"><i class="fas fa-sync-alt"></i></button>
+                            <button title="Deactivate Account" class="action-button" style="color: var(--alert-red);"><i class="fas fa-user-slash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1002</td>
+                        <td>Jane Doe</td>
+                        <td>jane.doe@web.com</td>
+                        <td><span style="color: var(--accent-green); font-weight: 600;">Active</span></td>
+                        <td>2 hours ago (Login)</td>
+                        <td>
+                            <button title="View Profile" class="action-button" style="color: var(--primary-blue);"><i class="fas fa-eye"></i></button>
+                            <button title="Reset Password" class="action-button" style="color: var(--alert-yellow);"><i class="fas fa-sync-alt"></i></button>
+                            <button title="Deactivate Account" class="action-button" style="color: var(--alert-red);"><i class="fas fa-user-slash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1003</td>
+                        <td>Rishi K.</td>
+                        <td>rishi@client.net</td>
+                        <td><span style="color: var(--alert-yellow); font-weight: 600;">Inactive</span></td>
+                        <td>3 weeks ago</td>
+                        <td>
+                            <button title="View Profile" class="action-button" style="color: var(--primary-blue);"><i class="fas fa-eye"></i></button>
+                            <button title="Reset Password" class="action-button" style="color: var(--alert-yellow);"><i class="fas fa-sync-alt"></i></button>
+                            <button title="Activate Account" class="action-button" style="color: var(--accent-green);"><i class="fas fa-user-check"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
